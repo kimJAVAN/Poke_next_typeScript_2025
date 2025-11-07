@@ -1,6 +1,7 @@
 // FavoriteDialog.tsx
 import { useUserInfo } from "@/contexts/UserInfoProvider";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "./ui/alert-dialog";
+import { useContext } from "react";
 
 interface FavoriteProps {
   open: boolean;
@@ -13,11 +14,30 @@ export default function FavoriteDialog({
   open, onOpenChange, pokemonId, pokemonName
 }: FavoriteProps) {
   const { favorites, setFavorites } = useUserInfo();  // Context 가져옴
+  
   const isFavorited = favorites.includes(pokemonId);
 
   async function handleConfirm() {
     // TODO HandleConfirm 내부 구현하기
-    
+    if (isFavorited) {
+      // ✅ 삭제
+      await fetch('/api/favorites', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pokemon_id: pokemonId })
+      });
+      setFavorites(favorites.filter(id => id !== pokemonId));
+    } else {
+      // ✅ 추가
+      await fetch('/api/favorites', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pokemon_id: pokemonId })
+      });
+      setFavorites([...favorites, pokemonId]);
+    }
+
+    onOpenChange(false)
   }
 
   return (
