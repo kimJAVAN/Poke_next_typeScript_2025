@@ -14,7 +14,7 @@ import { useEffect, useState } from "react";
 import { FaStar } from "react-icons/fa6";
 import FavoriteDialog from "./FavoriteDialog";
 
-export default function PokemonCard({pokemon}:{pokemon:PokemonProps}) {
+export default function PokemonCard({pokemon, priority=false}:{pokemon:PokemonProps, priority? : boolean}) {
   // TODO session, favorites, showDialog, isFavorited 추가
   const {data:session} = useSession()
   const {favorites, setFavorites} = useUserInfo()
@@ -76,7 +76,7 @@ export default function PokemonCard({pokemon}:{pokemon:PokemonProps}) {
               <div className="flex justify-center gap-2">
                 {pokemon?.types.map((t,i)=> <TypeBadge key={i} typeName={t}/>)}
               </div>
-              <Image src={pokemon?.image} alt={pokemon?.name} width={100} height={100} className="w-full h-full"/>
+              <Image src={pokemon?.image} alt={pokemon?.name} width={100} height={100} priority={priority} className="w-full h-full"/>
             </CardContent>
         </Card>
       </Link>

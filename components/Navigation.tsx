@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { useTheme } from "next-themes";
 import Link from "next/link";
-import { FaMoon, FaSun } from "react-icons/fa";
+import { FaMoon, FaSun } from "react-icons/fa6";
 import LoginButton from "./loginButton";
 
 
