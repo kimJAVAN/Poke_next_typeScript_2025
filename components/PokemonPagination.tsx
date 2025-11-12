@@ -8,13 +8,19 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination"
 
+interface PokemonPaginationProps {
+  currentPage : number
+  totalPages : number
+  params : {page?:string, type? : string}
+}
+
 export default function PokemonPagination({
   currentPage,
   totalPages,
-}: {
-  currentPage: number
-  totalPages: number
-}) {
+  params
+}: 
+  PokemonPaginationProps
+) {
   const PAGE_GROUP_SIZE = 10
   const currentGroup = Math.floor((currentPage - 1) / PAGE_GROUP_SIZE)
 
@@ -27,6 +33,12 @@ export default function PokemonPagination({
   const prevGroupPage = startPage - PAGE_GROUP_SIZE
   const nextGroupPage = endPage + 1
 
+  const buildPageUrl = (page:number )=>{
+    const urlParams = new URLSearchParams(params as Record<string,string>)
+    urlParams.set('page', page.toString())
+    return `/?${urlParams.toString()}`
+  }
+
   return (
     <Pagination>
       <PaginationContent>
@@ -34,7 +46,7 @@ export default function PokemonPagination({
         {/* 이전 그룹 */}
         <PaginationItem>
           <PaginationPrevious
-            href={hasPrevGroup ? `/?page=${prevGroupPage}` : undefined}
+            href={currentPage > 1 ?  buildPageUrl(prevGroupPage): undefined}
             className={!hasPrevGroup ? "invisible" : ""}
           />
         </PaginationItem>
@@ -46,7 +58,7 @@ export default function PokemonPagination({
           return (
             <PaginationItem key={pageNum}>
               <PaginationLink
-                href={`/?page=${pageNum}`}
+                href={buildPageUrl(pageNum)}
                 isActive={currentPage === pageNum}
               >
                 {pageNum}
@@ -58,7 +70,7 @@ export default function PokemonPagination({
         {/* 다음 그룹 */}
         <PaginationItem>
           <PaginationNext
-            href={hasNextGroup ? `/?page=${nextGroupPage}` : undefined}
+            href={currentPage < totalPages ? buildPageUrl(nextGroupPage) :undefined}
             className={!hasNextGroup ? "invisible" : ""}
           />
         </PaginationItem>
