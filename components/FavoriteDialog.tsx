@@ -1,11 +1,9 @@
-// FavoriteDialog.tsx
-import { useUserInfo } from "@/contexts/UserInfoProvider";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "./ui/alert-dialog";
-import { useContext } from "react";
+import { useUserStore } from "@/store/userStore";
 
 interface FavoriteProps {
   open: boolean;
-  onOpenChange: (open: boolean) => void; // setShowDialog -> 창 닫기 위해 가져옴
+  onOpenChange: (open: boolean) => void;
   pokemonId: number; 
   pokemonName: string;
 }
@@ -13,31 +11,42 @@ interface FavoriteProps {
 export default function FavoriteDialog({
   open, onOpenChange, pokemonId, pokemonName
 }: FavoriteProps) {
-  const { favorites, setFavorites } = useUserInfo();  // Context 가져옴
-  
+
+  // Zustand store 가져오기
+  const { favorites, addFavorite, removeFavorite } = useUserStore();
+
   const isFavorited = favorites.includes(pokemonId);
 
   async function handleConfirm() {
-    // TODO HandleConfirm 내부 구현하기
-    if (isFavorited) {
-      // ✅ 삭제
-      await fetch('/api/favorites', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pokemon_id: pokemonId })
-      });
-      setFavorites(favorites.filter(id => id !== pokemonId));
-    } else {
-      // ✅ 추가
-      await fetch('/api/favorites', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pokemon_id: pokemonId })
-      });
-      setFavorites([...favorites, pokemonId]);
+    try {
+      if (isFavorited) {
+        // 🗑️ 삭제 요청
+        await fetch('/api/favorites', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pokemon_id: pokemonId })
+        });
+
+        // Zustand 스토어에서 삭제
+        removeFavorite(pokemonId);
+
+      } else {
+        // ⭐ 추가 요청
+        await fetch('/api/favorites', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pokemon_id: pokemonId })
+        });
+
+        // Zustand 스토어에서 추가
+        addFavorite(pokemonId);
+      }
+
+    } catch (err) {
+      console.error("favorite update error:", err);
     }
 
-    onOpenChange(false)
+    onOpenChange(false);
   }
 
   return (
@@ -57,5 +66,5 @@ export default function FavoriteDialog({
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-  )
+  );
 }

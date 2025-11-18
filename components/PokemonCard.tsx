@@ -8,10 +8,11 @@ import { cn } from "@/lib/utils";
 import TypeBadge from "./TypeBadge";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
-import { useUserInfo } from "@/contexts/UserInfoProvider";
+
 import { useEffect, useState } from "react";
 import { FaStar } from "react-icons/fa6";
 import FavoriteDialog from "./FavoriteDialog";
+import { useUserStore } from "@/store/userStore";
 
 interface PokemonCardProps {
   pokemon: PokemonProps;
@@ -20,7 +21,10 @@ interface PokemonCardProps {
 
 export default function PokemonCard({ pokemon, priority = false }: PokemonCardProps) {
   const { data: session } = useSession();
-  const { favorites, setFavorites } = useUserInfo();
+  // const { favorites, setFavorites } = useUserInfo();
+
+  const favorites = useUserStore(state=>state.favorites)
+
   const [showDialog, setShowDialog] = useState(false);
 
   const isFavorited = favorites.includes(pokemon.id);
